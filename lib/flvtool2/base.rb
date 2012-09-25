@@ -42,6 +42,7 @@ module FLVTool2
         end
         
         process_files(options) do |stream, in_path, out_path|
+	  stream.audio_keyframe_mode = options[:audio_keyframe_mode]
           write_stream = false
           options[:commands].each do |command|
             write_stream = true if send( command, options, stream, in_path, out_path )

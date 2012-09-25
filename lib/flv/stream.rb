@@ -43,6 +43,7 @@ module FLV
                   :type_flags_audio,
                   :type_flags_video,
                   :tags,
+		  :audio_keyframe_mode,
                   :stream_log
     
     def initialize(in_stream, out_stream = nil, stream_log = false)
@@ -69,6 +70,7 @@ module FLV
         @extra_data = ''
         @tags = []
       end
+      @audio_keyframe_mode = false
     end
     
     
@@ -203,9 +205,22 @@ module FLV
     end
     
     def keyframe_video_tags
+      @keyframe_video_tags_cache ||= keyframe_audio_tags if @audio_keyframe_mode
       @keyframe_video_tags_cache ||= @tags.find_all do |tag|
         tag.kind_of?(FLVVideoTag) && tag.frame_type == FLVVideoTag::KEYFRAME
       end
+    end
+
+    def keyframe_audio_tags
+      result = nil
+#      if !has_video? && has_audio?
+      if has_audio?
+        result = []
+        src = audio_tags
+        # Get each 28 audio tag (~0.5 sec)
+        (0 .. src.size - 1).step(28) {|i| result << src[i] }
+      end
+      result
     end
     
     def audio_tags
@@ -286,7 +301,8 @@ module FLV
     end
     
     def lastkeyframetimestamp
-      return nil unless has_video?
+      return nil if keyframe_video_tags.nil?
+#      return nil unless has_video?
       (keyframe_video_tags.last.nil? || keyframe_video_tags.last.timestamp.nil?) ? 0 : keyframe_video_tags.last.timestamp / 1000.0
     end
     

@@ -29,7 +29,8 @@ require 'flvtool2/base'
 module FLVTool2
   
   SHELL_COMMAND_NAME = (RUBY_PLATFORM =~ /win32/) ? 'flvtool2.exe' : 'flvtool2'
-  SWITCHES = %w{ s v r p x c i o k t n l a }
+  SWITCHES = %w{ s v r p x c i o k t n l a y }
+#  SWITCHES = %w{ s v r p x c i o k t n l a }
   COMMANDS = %w{ U C P D A V }
   
   def self.parse_arguments
@@ -50,6 +51,7 @@ module FLVTool2
     options[:in_point] = nil
     options[:out_point] = nil
     options[:keyframe_mode] = false
+    options[:audio_keyframe_mode] = false
     options[:tag_file] = nil
     options[:tag_number] = nil
     options[:stream_log] = false
@@ -84,6 +86,8 @@ module FLVTool2
             options[:out_point] = ARGV.shift.to_i
           when 'k'
             options[:keyframe_mode] = true
+          when 'y'
+            options[:audio_keyframe_mode] = true
           when 't'
             options[:tag_file] = ARGV.shift
           when 'n'
@@ -214,6 +218,7 @@ module FLVTool2
     puts "  -t path       Tagfile (MetaTags written in XML)\n"
     puts "  -v            Verbose mode\n"
     puts "  -x            XML mode instead of YAML mode\n"
+    puts "  -y            Try to generate keyframes for audio only files automaticaly\n"
     puts "\n"
     puts "REPORT BUGS at http://projects.inlet-media.de/flvtool2"
     puts "Powered by Riva VX, http://rivavx.com\n"
